@@ -1,0 +1,46 @@
+---
+- name: Full platform deployment
+  hosts: localhost
+  become: false
+
+  tasks:
+
+    - name: Create docker network
+      community.docker.docker_network:
+        name: collateral-net
+        state: present
+
+    - name: Run PostgreSQL container
+      community.docker.docker_container:
+        name: collateral-db
+        image: postgres:15
+        state: started
+        restart_policy: always
+        networks:
+          - name: collateral-net
+        env:
+          POSTGRES_DB: collateral
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - "5432:5432"
+
+    - name: Wait for PostgreSQL
+      wait_for:
+        host: localhost
+        port: 5432
+        delay: 5
+        timeout: 30
+
+    - name: Deploy collateral-service
+      community.docker.docker_container:
+        name: collateral-service
+        image: javisaizengineer/collateral-service:latest
+        state: started
+        recreate: true
+        pull: true
+        restart_policy: always
+        networks:
+          - name: collateral-net
+        ports:
+          - "8080:8080"
