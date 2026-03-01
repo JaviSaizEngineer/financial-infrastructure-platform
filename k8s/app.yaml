@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: collateral-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: collateral-service
+  template:
+    metadata:
+      labels:
+        app: collateral-service
+    spec:
+      containers:
+        - name: collateral-service
+          image: javisaizengineer/collateral-service:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://collateral-db:5432/collateral
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: postgres
