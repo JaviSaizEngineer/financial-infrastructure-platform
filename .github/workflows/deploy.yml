@@ -44,5 +44,8 @@ jobs:
       - name: Deploy
         run: kubectl apply -f k8s/
 
-      - name: Wait pods
-        run: kubectl get pods -w --timeout=120s
+      - name: Wait for deployments
+        run: |
+          kubectl wait --for=condition=available \
+            --timeout=120s \
+            deployment --all
