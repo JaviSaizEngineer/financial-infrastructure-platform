@@ -12,11 +12,9 @@ spec:
       labels:
         app: trade-service
     spec:
-      imagePullSecrets:
-        - name: regcred
       containers:
         - name: trade-service
-          image: javisaizengineer/trade-service:latest
-          imagePullPolicy: Always
+          image: trade-service:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080

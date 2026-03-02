@@ -12,11 +12,9 @@ spec:
       labels:
         app: collateral-service
     spec:
-      imagePullSecrets:
-        - name: regcred
       containers:
         - name: collateral-service
-          image: javisaizengineer/collateral-service:latest
-          imagePullPolicy: Always
+          image: collateral-service:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080

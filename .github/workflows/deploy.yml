@@ -1,64 +1,85 @@
 name: Deploy Infrastructure
 
 on:
-  workflow_run:
-    workflows:
-      - Trade Service CI
-      - Pricing Service CI
-      - Collateral Service CI
-      - API Gateway CI
-    types:
-      - completed
-
-concurrency:
-  group: deploy-infrastructure
-  cancel-in-progress: true
+  push:
+    branches:
+      - main
 
 jobs:
   deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - uses: actions/checkout@v3
-
-      - uses: azure/setup-kubectl@v3
-
-      - name: Install Kind
+      # ---------------------------
+      # Install kubectl
+      # ---------------------------
+      - name: Install kubectl
         run: |
-          curl -Lo kind https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64
-          chmod +x kind
-          sudo mv kind /usr/local/bin/kind
+          curl -LO "https://dl.k8s.io/release/$(curl -Ls https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
 
-      - name: Create cluster
+      # ---------------------------
+      # Install kind
+      # ---------------------------
+      - name: Install kind
+        run: |
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64
+          chmod +x ./kind
+          sudo mv ./kind /usr/local/bin/kind
+
+      # ---------------------------
+      # Create cluster
+      # ---------------------------
+      - name: Create kind cluster
         run: kind create cluster
 
-      - name: Create docker secret
+      # ---------------------------
+      # Build Docker images
+      # ---------------------------
+      - name: Build Docker images
         run: |
-          kubectl create secret docker-registry regcred \
-            --docker-username=${{ secrets.DOCKER_USERNAME }} \
-            --docker-password=${{ secrets.DOCKER_PASSWORD }}
+          docker build -t trade-service:latest ./trade-service
+          docker build -t collateral-service:latest ./collateral-service
+          docker build -t pricing-service:latest ./pricing-service
+          docker build -t api-gateway:latest ./api-gateway
 
-      - name: Deploy
-        run: kubectl apply -f k8s/
-
-      - name: Debug pods
+      # ---------------------------
+      # Load images into kind
+      # ---------------------------
+      - name: Load images into kind
         run: |
-          echo "=== POD STATUS ==="
-          kubectl get pods -A
+          kind load docker-image trade-service:latest
+          kind load docker-image collateral-service:latest
+          kind load docker-image pricing-service:latest
+          kind load docker-image api-gateway:latest
 
-          echo "=== DESCRIBE ==="
-          kubectl describe pods
+      # ---------------------------
+      # Apply Kubernetes manifests
+      # ---------------------------
+      - name: Apply Kubernetes manifests
+        run: |
+          kubectl apply -f k8s/
 
-          echo "=== LOGS ==="
-          for pod in $(kubectl get pods -o name); do
-            echo "Logs for $pod"
-            kubectl logs $pod --all-containers=true || true
-          done
-
+      # ---------------------------
+      # Wait for deployments
+      # ---------------------------
       - name: Wait for deployments
         run: |
-          kubectl wait --for=condition=available \
-            --timeout=120s \
-            deployment --all
+          kubectl wait --for=condition=available deployment/api-gateway --timeout=180s
+          kubectl wait --for=condition=available deployment/collateral-service --timeout=180s
+          kubectl wait --for=condition=available deployment/pricing-service --timeout=180s
+          kubectl wait --for=condition=available deployment/trade-service --timeout=180s
+
+      # ---------------------------
+      # Debug (only if something fails)
+      # ---------------------------
+      - name: Debug pods (if failure)
+        if: failure()
+        run: |
+          kubectl get pods -A
+          kubectl describe pods
+          kubectl get services

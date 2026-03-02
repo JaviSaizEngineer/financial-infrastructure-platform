@@ -12,11 +12,9 @@ spec:
       labels:
         app: pricing-service
     spec:
-      imagePullSecrets:
-        - name: regcred
       containers:
         - name: pricing-service
-          image: javisaizengineer/pricing-service:latest
-          imagePullPolicy: Always
+          image: pricing-service:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
