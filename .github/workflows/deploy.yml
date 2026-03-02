@@ -43,6 +43,20 @@ jobs:
       - name: Deploy
         run: kubectl apply -f k8s/
 
+      - name: Debug pods
+        run: |
+          echo "=== POD STATUS ==="
+          kubectl get pods -A
+
+          echo "=== DESCRIBE ==="
+          kubectl describe pods
+
+          echo "=== LOGS ==="
+          for pod in $(kubectl get pods -o name); do
+            echo "Logs for $pod"
+            kubectl logs $pod --all-containers=true || true
+          done
+
       - name: Wait for deployments
         run: |
           kubectl wait --for=condition=available \
