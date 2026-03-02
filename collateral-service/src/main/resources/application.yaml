@@ -2,15 +2,12 @@ server:
   port: 8080
 
 spring:
-  datasource:
-    url: jdbc:postgresql://collateral-db:5432/collateral
-    username: postgres
-    password: postgres
+  application:
+    name: collateral-service
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 
 management:
   endpoints:
