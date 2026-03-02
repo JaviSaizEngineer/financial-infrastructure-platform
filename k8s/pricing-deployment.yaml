@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: pricing-service
-          image: pricing-service:latest
+          image: javisaizengineer/pricing-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080

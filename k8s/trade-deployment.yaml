@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: trade-service
-          image: trade-service:latest
+          image: javisaizengineer/trade-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080

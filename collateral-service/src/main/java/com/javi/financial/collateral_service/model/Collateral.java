@@ -3,6 +3,8 @@ package com.javi.financial.collateral_service.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "collateral")
 @Getter
@@ -16,9 +18,11 @@ public class Collateral {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String counterparty;
+    private String accountId;
+    private BigDecimal collateralAmount;
+    private BigDecimal marginRequired;
+    private BigDecimal exposure;
+    private String status; // OK, MARGIN_CALL, BREACH
 
-    private Double amount;
-
-    private String currency;
+    // getters & setters
 }

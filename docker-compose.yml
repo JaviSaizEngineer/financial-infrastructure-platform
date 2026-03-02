@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
 
   postgres:
@@ -16,7 +14,6 @@ services:
 
   collateral-service:
     build: ./collateral-service
-    container_name: collateral-service
     depends_on:
       - postgres
     ports:
@@ -28,28 +25,29 @@ services:
 
   pricing-service:
     build: ./pricing-service
-    container_name: pricing-service
     ports:
-      - "8081:8081"
+      - "8081:8080"
 
   trade-service:
     build: ./trade-service
-    container_name: trade-service
     depends_on:
       - pricing-service
-      - collateral-service
+      - postgres
     ports:
-      - "8082:8082"
+      - "8082:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/collateral
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
 
   api-gateway:
     build: ./api-gateway
-    container_name: api-gateway
     depends_on:
       - trade-service
       - pricing-service
       - collateral-service
     ports:
-      - "8085:8085"
+      - "8085:8080"
 
 volumes:
   postgres_data:

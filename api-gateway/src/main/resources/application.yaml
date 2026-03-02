@@ -4,22 +4,16 @@ spring:
       routes:
 
         - id: pricing-service
-          uri: http://pricing-service:8081
+          uri: http://pricing-service:8080
           predicates:
             - Path=/pricing/**
-          filters:
-            - RewritePath=/pricing/(?<segment>.*), /${segment}
 
         - id: trade-service
-          uri: http://trade-service:8082
+          uri: http://trade-service:8080
           predicates:
             - Path=/trade/**
-          filters:
-            - RewritePath=/trade/(?<segment>.*), /${segment}
 
         - id: collateral-service
           uri: http://collateral-service:8080
           predicates:
             - Path=/collateral/**
-          filters:
-            - RewritePath=/collateral/(?<segment>.*), /${segment}
