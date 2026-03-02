@@ -1,0 +1,48 @@
+name: Deploy Infrastructure
+
+on:
+  workflow_run:
+    workflows:
+      - Trade Service CI
+      - Pricing Service CI
+      - Collateral Service CI
+      - API Gateway CI
+    types:
+      - completed
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - uses: azure/setup-kubectl@v3
+
+      - name: Install Kind
+        run: |
+          curl -Lo kind https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64
+          chmod +x kind
+          sudo mv kind /usr/local/bin/kind
+
+      - name: Create cluster
+        run: kind create cluster
+
+      - name: Create docker secret
+        run: |
+          kubectl create secret docker-registry regcred \
+            --docker-username=${{ secrets.DOCKER_USERNAME }} \
+            --docker-password=${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Inject image tag
+        run: |
+          TAG=${{ github.event.workflow_run.run_number }}
+          sed -i "s/TAG/$TAG/g" k8s/*.yaml
+
+      - name: Deploy
+        run: kubectl apply -f k8s/
+
+      - name: Wait pods
+        run: kubectl get pods -w --timeout=120s

@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: collateral-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: collateral-service
+  template:
+    metadata:
+      labels:
+        app: collateral-service
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: collateral-service
+          image: javisaizengineer/collateral-service:TAG
+          ports:
+            - containerPort: 8080

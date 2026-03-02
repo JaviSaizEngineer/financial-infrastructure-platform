@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pricing-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pricing-service
+  template:
+    metadata:
+      labels:
+        app: pricing-service
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: pricing-service
+          image: javisaizengineer/pricing-service:TAG
+          ports:
+            - containerPort: 8080
