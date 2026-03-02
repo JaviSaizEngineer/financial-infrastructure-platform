@@ -1,0 +1,31 @@
+name: Deploy to Kubernetes
+
+on:
+  workflow_run:
+    workflows:
+      - API Gateway CI
+      - Pricing Service CI
+      - Trade Service CI
+      - Collateral Service CI
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Configure kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+
+      - name: Restart deployments
+        run: |
+          kubectl rollout restart deployment api-gateway
+          kubectl rollout restart deployment pricing-service
+          kubectl rollout restart deployment trade-service
+          kubectl rollout restart deployment collateral-service
