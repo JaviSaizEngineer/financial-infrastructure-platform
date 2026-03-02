@@ -16,6 +16,7 @@ spec:
         - name: regcred
       containers:
         - name: trade-service
-          image: javisaizengineer/trade-service:TAG
+          image: javisaizengineer/trade-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080

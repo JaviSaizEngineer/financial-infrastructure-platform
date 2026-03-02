@@ -16,6 +16,7 @@ spec:
         - name: regcred
       containers:
         - name: pricing-service
-          image: javisaizengineer/pricing-service:TAG
+          image: javisaizengineer/pricing-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080

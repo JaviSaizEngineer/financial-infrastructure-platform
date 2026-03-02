@@ -29,8 +29,5 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build image
-        run: docker build -t javisaizengineer/trade-service:${{ github.run_number }} trade-service
-
-      - name: Push image
-        run: docker push javisaizengineer/trade-service:${{ github.run_number }}
+      - run: docker build -t javisaizengineer/trade-service:latest .
+      - run: docker push javisaizengineer/trade-service:latest

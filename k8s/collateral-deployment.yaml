@@ -16,6 +16,7 @@ spec:
         - name: regcred
       containers:
         - name: collateral-service
-          image: javisaizengineer/collateral-service:TAG
+          image: javisaizengineer/collateral-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080

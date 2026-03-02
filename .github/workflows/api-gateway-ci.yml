@@ -26,5 +26,5 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - run: docker build -t javisaizengineer/api-gateway:${{ github.run_number }} api-gateway
-      - run: docker push javisaizengineer/api-gateway:${{ github.run_number }}
+      - run: docker build -t javisaizengineer/api-gateway:latest .
+      - run: docker push javisaizengineer/api-gateway:latest

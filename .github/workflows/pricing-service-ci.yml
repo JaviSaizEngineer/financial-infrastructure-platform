@@ -26,5 +26,5 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - run: docker build -t javisaizengineer/pricing-service:${{ github.run_number }} pricing-service
-      - run: docker push javisaizengineer/pricing-service:${{ github.run_number }}
+      - run: docker build -t javisaizengineer/pricing-service:latest .
+      - run: docker push javisaizengineer/pricing-service:latest

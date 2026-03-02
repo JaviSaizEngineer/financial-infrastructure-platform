@@ -36,11 +36,6 @@ jobs:
             --docker-username=${{ secrets.DOCKER_USERNAME }} \
             --docker-password=${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Inject image tag
-        run: |
-          TAG=${{ github.event.workflow_run.run_number }}
-          sed -i "s/TAG/$TAG/g" k8s/*.yaml
-
       - name: Deploy
         run: kubectl apply -f k8s/
 

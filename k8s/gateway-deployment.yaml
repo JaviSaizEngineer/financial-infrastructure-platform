@@ -16,6 +16,7 @@ spec:
         - name: regcred
       containers:
         - name: api-gateway
-          image: javisaizengineer/api-gateway:TAG
+          image: javisaizengineer/api-gateway:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
